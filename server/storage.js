@@ -1,0 +1,171 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const DATA_DIR = path.join(__dirname, '..', 'data');
+const DB_FILE = path.join(DATA_DIR, 'database.json');
+
+const INITIAL_DATA = {
+  storeInfo: {
+    name: 'KEDAI "AMUD KUMIS"',
+    subtitle: 'HIDANGAN KHAS JAKARTA',
+    description: 'Sop Kaki Kambing & Sate Ayam | Sop Daging Sapi & Sate Kambing',
+    address: 'Jl. Limo Raya (Dekat Kampus UPN Limo)',
+    phone: '0812-3456-7890',
+  },
+  products: [
+    { id: 'PROD-01', name: 'Sop Kaki Special (Kambing)', category: 'Makanan Utama', type: 'Porsian', price: 48000, active: true },
+    { id: 'PROD-02', name: 'Sop Daging (Sapi)', category: 'Makanan Utama', type: 'Porsian', price: 42000, active: true },
+    { id: 'PROD-03', name: 'Sop Campur Biasa', category: 'Makanan Utama', type: 'Porsian', price: 42000, active: true },
+    { id: 'PROD-04', name: 'Sop Campur Kaki (Kambing)', category: 'Makanan Utama', type: 'Porsian', price: 48000, active: true },
+    { id: 'PROD-05', name: 'Sop Campur (Otak & Kaki)', category: 'Makanan Utama', type: 'Porsian', price: 50000, active: true },
+    { id: 'PROD-06', name: 'Potongan (Daging / Jeroan)', category: 'SOP PILIHAN', type: 'Prasmanan', price: 7000, unit: 'potong', active: true },
+    { id: 'PROD-07', name: 'Kaki Kambing (Pilihan)', category: 'SOP PILIHAN', type: 'Prasmanan', price: 22000, unit: 'pcs', active: true },
+    { id: 'PROD-08', name: 'Sumsum / Otak (Pilihan)', category: 'SOP PILIHAN', type: 'Prasmanan', price: 16000, unit: 'porsi', active: true },
+    { id: 'PROD-09', name: 'Sate Kambing (10 Tusuk)', category: 'Menu Sate', type: 'Porsian', price: 45000, active: true },
+    { id: 'PROD-10', name: 'Sate Ayam (10 Tusuk)', category: 'Menu Sate', type: 'Porsian', price: 30000, active: true },
+    { id: 'PROD-11', name: 'Nasi Putih', category: 'Pelengkap', type: 'Porsian', price: 6000, active: true },
+    { id: 'PROD-12', name: 'Emping / Kerupuk', category: 'Pelengkap', type: 'Porsian', price: 5000, active: true },
+    { id: 'PROD-13', name: 'ES Jeruk / Jeruk Panas', category: 'Minuman', type: 'Porsian', price: 8000, active: true },
+    { id: 'PROD-14', name: 'Es Teh Manis / Teh Manis Panas', category: 'Minuman', type: 'Porsian', price: 5000, active: true },
+    { id: 'PROD-15', name: 'ES Teh Botol', category: 'Minuman', type: 'Porsian', price: 6000, active: true },
+    { id: 'PROD-16', name: 'Es Teh Tawar / Teh Tawar Panas', category: 'Minuman', type: 'Porsian', price: 2000, active: true },
+    { id: 'PROD-17', name: 'Air Mineral', category: 'Minuman', type: 'Porsian', price: 4000, active: true },
+  ],
+  ingredients: [
+    { id: 'ING-01', name: 'Daging Sapi (Gandik/Sengkel)', category: 'Daging & Jeroan', unit: 'kg', stock: 18.5, minStock: 5 },
+    { id: 'ING-02', name: 'Kaki Kambing Segar', category: 'Daging & Jeroan', unit: 'pcs', stock: 35, minStock: 10 },
+    { id: 'ING-03', name: 'Babat Sapi', category: 'Daging & Jeroan', unit: 'kg', stock: 8.0, minStock: 3 },
+    { id: 'ING-04', name: 'Paru Sapi', category: 'Daging & Jeroan', unit: 'kg', stock: 7.5, minStock: 3 },
+    { id: 'ING-05', name: 'Kikil Sapi', category: 'Daging & Jeroan', unit: 'kg', stock: 10.0, minStock: 4 },
+    { id: 'ING-06', name: 'Otak & Sumsum Kambing/Sapi', category: 'Daging & Jeroan', unit: 'pcs', stock: 14, minStock: 5 },
+    { id: 'ING-07', name: 'Daging Ayam (Fillet Sate)', category: 'Daging & Jeroan', unit: 'kg', stock: 12.0, minStock: 4 },
+    { id: 'ING-08', name: 'Daging Kambing Sate', category: 'Daging & Jeroan', unit: 'kg', stock: 9.0, minStock: 3 },
+    { id: 'ING-09', name: 'Susu Evaporasi Tiga Sapi/Carnation', category: 'Kuah & Olahan', unit: 'kaleng', stock: 48, minStock: 12 },
+    { id: 'ING-10', name: 'Santan Kelapa Murni', category: 'Kuah & Olahan', unit: 'liter', stock: 20, minStock: 5 },
+    { id: 'ING-11', name: 'Minyak Samit / Ghee Cap Onta', category: 'Bumbu & Rempah', unit: 'kaleng', stock: 4, minStock: 2 },
+    { id: 'ING-12', name: 'Bawang Merah & Putih Kupas', category: 'Bumbu & Rempah', unit: 'kg', stock: 15.0, minStock: 5 },
+    { id: 'ING-13', name: 'Rempah Sop (Kapulaga, Cengkeh, Kayu Manis)', category: 'Bumbu & Rempah', unit: 'pack', stock: 12, minStock: 4 },
+    { id: 'ING-14', name: 'Cabai Rawit Merah (Sambal)', category: 'Sayuran & Segar', unit: 'kg', stock: 8.0, minStock: 3 },
+    { id: 'ING-15', name: 'Beras Pulen Super', category: 'Bahan Pokok', unit: 'kg', stock: 120.0, minStock: 25 },
+    { id: 'ING-16', name: 'Emping Melinjo Kering', category: 'Pelengkap', unit: 'kg', stock: 15.0, minStock: 5 },
+    { id: 'ING-17', name: 'Jeruk Limau & Jeruk Peras', category: 'Sayuran & Segar', unit: 'kg', stock: 18.0, minStock: 5 },
+    { id: 'ING-18', name: 'Gula Pasir & Garam', category: 'Bumbu & Rempah', unit: 'kg', stock: 35.0, minStock: 10 },
+    { id: 'ING-19', name: 'Teh Botol Sosro', category: 'Minuman Jadi', unit: 'botol', stock: 72, minStock: 24 },
+    { id: 'ING-20', name: 'Air Mineral Botol 600ml', category: 'Minuman Jadi', unit: 'botol', stock: 96, minStock: 24 },
+    { id: 'ING-21', name: 'Gas LPG 3kg / 12kg', category: 'Operasional', unit: 'tabung', stock: 6, minStock: 2 },
+    { id: 'ING-22', name: 'Es Batu Kristal', category: 'Operasional', unit: 'bal', stock: 8, minStock: 3 }
+  ],
+  purchases: [
+    {
+      id: 'BELANJA-20260901-001',
+      date: '2026-09-01T06:30:00.000Z',
+      supplier: 'Pasar Induk Kramat Jati',
+      buyer: 'Bang Amud',
+      items: [
+        { ingredientId: 'ING-01', name: 'Daging Sapi (Gandik/Sengkel)', qty: 15, unit: 'kg', unitPrice: 125000, subtotal: 1875000 },
+        { ingredientId: 'ING-02', name: 'Kaki Kambing Segar', qty: 25, unit: 'pcs', unitPrice: 15000, subtotal: 375000 },
+        { ingredientId: 'ING-03', name: 'Babat Sapi', qty: 6, unit: 'kg', unitPrice: 65000, subtotal: 390000 },
+        { ingredientId: 'ING-04', name: 'Paru Sapi', qty: 6, unit: 'kg', unitPrice: 70000, subtotal: 420000 },
+        { ingredientId: 'ING-09', name: 'Susu Evaporasi Tiga Sapi/Carnation', qty: 24, unit: 'kaleng', unitPrice: 16500, subtotal: 396000 },
+      ],
+      totalAmount: 3456000,
+      notes: 'Belanja stok awal pekan'
+    }
+  ],
+  sales: [
+    {
+      id: 'NOTA-20260901-01',
+      date: '2026-09-01T12:15:00.000Z',
+      tableNo: '03',
+      orderType: 'Dine-in',
+      cashier: 'Kasir 1',
+      items: [
+        { productId: 'PROD-02', name: 'Sop Daging (Sapi)', qty: 2, price: 42000, subtotal: 84000, notes: 'Kuah susu gurih' },
+        { productId: 'PROD-11', name: 'Nasi Putih', qty: 2, price: 6000, subtotal: 12000, notes: '' },
+        { productId: 'PROD-13', name: 'ES Jeruk / Jeruk Panas', qty: 2, price: 8000, subtotal: 16000, notes: 'Es Jeruk' },
+        { productId: 'PROD-12', name: 'Emping / Kerupuk', qty: 2, price: 5000, subtotal: 10000, notes: '' }
+      ],
+      totalAmount: 122000,
+      paymentMethod: 'Tunai',
+      status: 'Lunas',
+      notes: ''
+    },
+    {
+      id: 'NOTA-20260901-02',
+      date: '2026-09-01T13:00:00.000Z',
+      tableNo: '07',
+      orderType: 'Dine-in',
+      cashier: 'Kasir 1',
+      items: [
+        { productId: 'PROD-06', name: 'SOP PILIHAN (Prasmanan: 6 Potong Daging @ Rp 7.000)', qty: 6, price: 7000, subtotal: 42000, notes: 'Daging 3, Babat 2, Paru 1' },
+        { productId: 'PROD-07', name: 'Kaki Kambing (Pilihan)', qty: 1, price: 22000, subtotal: 22000, notes: '' },
+        { productId: 'PROD-11', name: 'Nasi Putih', qty: 2, price: 6000, subtotal: 12000, notes: '' },
+        { productId: 'PROD-14', name: 'Es Teh Manis / Teh Manis Panas', qty: 2, price: 5000, subtotal: 10000, notes: 'Es Teh Manis' }
+      ],
+      totalAmount: 86000,
+      paymentMethod: 'QRIS',
+      status: 'Lunas',
+      notes: 'Prasmanan Meja 7'
+    }
+  ],
+  mutations: [
+    {
+      id: 'MUT-01',
+      date: '2026-09-01T06:45:00.000Z',
+      type: 'Masuk',
+      source: 'Belanja Pasar',
+      refId: 'BELANJA-20260901-001',
+      itemName: 'Daging Sapi (Gandik/Sengkel)',
+      qty: 15,
+      unit: 'kg',
+      notes: 'Penerimaan belanja pasar'
+    },
+    {
+      id: 'MUT-02',
+      date: '2026-09-01T08:00:00.000Z',
+      type: 'Keluar',
+      source: 'Pemakaian Dapur',
+      refId: '-',
+      itemName: 'Daging Sapi (Gandik/Sengkel)',
+      qty: 8,
+      unit: 'kg',
+      notes: 'Perebusan kuah sop pagi'
+    }
+  ],
+  googleConfig: {
+    spreadsheetId: '',
+    clientEmail: '',
+    privateKey: '',
+    autoSync: false,
+    lastSyncTime: null,
+  }
+};
+
+export function getDatabase() {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+
+  if (!fs.existsSync(DB_FILE)) {
+    fs.writeFileSync(DB_FILE, JSON.stringify(INITIAL_DATA, null, 2), 'utf-8');
+    return INITIAL_DATA;
+  }
+
+  try {
+    const raw = fs.readFileSync(DB_FILE, 'utf-8');
+    return JSON.parse(raw);
+  } catch (err) {
+    console.error('Error reading database file, returning initial data:', err);
+    return INITIAL_DATA;
+  }
+}
+
+export function saveDatabase(data) {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
+}
